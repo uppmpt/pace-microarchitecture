@@ -346,20 +346,22 @@ module pcu6_v #(parameter HART_ID = 0) (
             v_we_lane0 <= 0;
             v_csr_we <= 0;
             mq_push_en <= 0;   // default pulso
+        if (wait_load) begin
+            if (ext_wr_en && ext_wr_addr != 5'd0) begin
+                pcu_regs[ext_wr_addr] <= ext_wr_data;
+            end
+        end
 
-                    end else if (wait_load) begin
-                if (ext_wr_en && ext_wr_addr != 5'd0) begin
-                    pcu_regs[ext_wr_addr] <= ext_wr_data;
-                end
-                if (ext_wr_en_q) begin
-                    wait_load <= 1'b0;
-                end
+        if (ext_wr_en_q) begin
+            wait_load <= 1'b0;
+        end
 
-        end else if (trap_taken_w) begin
+        if (trap_taken_w) begin
             pc <= trap_pc_w;
             branch_pending <= 0;
-        end else if (branch_pending) begin
-            if (redirect_valid) begin pc <= redirect_pc; branch_pending <= 0; end
+        end
+        else if (branch_pending) begin
+
         end else if (is_br[0]) begin
             branch_pending <= 1;
 
